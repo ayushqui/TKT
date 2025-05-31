@@ -17,6 +17,37 @@ removing support for CAN bus and HAM radio hardware for desktop PC kernels, this
 The main contribution to this project is to simply run it. If you can run this kernel on more hardware
 this will help us to debug any issues that may arise from our tunings, and we can address them.
 
+
+### Contribute Your Kernel Module Data
+
+Want to help improve hardware coverage for the TKT project? You can contribute your system’s kernel module data using one of two preferred methods.
+## Quick Overview
+# Option 1: lsmod (quick + easy)
+
+`lsmod | awk 'NR>1 {print $1}' | sort -u > ~/Desktop/$(hostname)-TKT-modules-list.txt`
+
+# Option 2: modprobed-db (thorough + preferred)
+
+All the detailed steps—including how to install and set up modprobed-db, generate your module list, and submit a pull request—are now maintained in the dedicated contribution guide here:
+[ETJAKEOC/modprobed.db](https://github.com/ETJAKEOC/modprobedb.db)
+
+## Goals
+
+Below is a checklist of platform-specific compile goals for this project. These represent both completed and planned features, and will help contributors and users see where the project is headed.
+
+```
+- [x] **Arch:** Complete GHCI build and patch set.
+- [x] **Debian:** Complete GHCI build and patch set.
+- [x] **Fedora:** Complete GHCI build and patch set.
+- [ ] **Gentoo (OpenRC):** Complete GHCI build and patch set.
+- [ ] **Gentoo (SystemD):** Complete GHCI build and patch set.
+- [ ] **Mint:** Complete GHCI build and patch set.
+- [ ] **Pop!_OS:** Complete GHCI build and patch set.
+- [x] **Slackware:** Complete GHCI build and patch set.
+- [x] **SUSE:** Complete GHCI build and patch set.
+- [x] **Ubuntu:** Complete GHCI build and patch set.
+```
+
 If you are interested in contributing to this project, please, feel free to fork it, and do some work.
 
 You can contact me on Discord @ETJAKEOC
