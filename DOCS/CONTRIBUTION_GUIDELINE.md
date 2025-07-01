@@ -41,7 +41,6 @@ Below is a checklist of platform-specific compile goals for this project. These 
 - [x] **Fedora:** Complete GHCI build and patch set.
 - [ ] **Gentoo (OpenRC):** Complete GHCI build and patch set.
 - [ ] **Gentoo (SystemD):** Complete GHCI build and patch set.
-- [ ] **Mint:** Complete GHCI build and patch set.
 - [ ] **Pop!_OS:** Complete GHCI build and patch set.
 - [x] **Slackware:** Complete GHCI build and patch set.
 - [x] **SUSE:** Complete GHCI build and patch set.
