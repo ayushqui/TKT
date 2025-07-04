@@ -2,14 +2,6 @@ diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
 index 3eee0143e0..bd1a95c897 100644
 --- a/scripts/package/kernel.spec
 +++ b/scripts/package/kernel.spec
-@@ -16,6 +16,7 @@ URL: https://www.kernel.org
- Source0: linux.tar.gz
- Source1: config
- Source2: diff.patch
-+Provides: kernel-uname-r = %{version}
- Provides: kernel-%{KERNELRELEASE}
- BuildRequires: bc binutils bison dwarves
- BuildRequires: (elfutils-libelf-devel or libelf-devel) flex
 @@ -27,8 +28,8 @@ The Linux Kernel, the operating system core itself
  %package headers
  Summary: Header files for the Linux kernel for use by glibc

@@ -1,16 +1,28 @@
 diff --git a/scripts/package/kernel.spec b/scripts/package/kernel.spec
-index 726f34e119..231c1e2451 100644
+index 726f34e119..MERGED123456 100644
 --- a/scripts/package/kernel.spec
 +++ b/scripts/package/kernel.spec
-@@ -14,6 +14,7 @@ URL: https://www.kernel.org
+@@ -4,13 +4,13 @@
+ %define makeflags %{?_smp_mflags} ARCH=%{ARCH}
+ 
+ Name: kernel
+-Summary: The Linux Kernel
++Summary: TꓘT's Linux Kernel
+ Version: %(echo %{KERNELRELEASE} | sed -e 's/-/_/g')
+ Release: %{pkg_release}
+ License: GPL
+ Group: System Environment/Kernel
+-Vendor: The Linux Community
+-URL: https://www.kernel.org
++Vendor: TꓘT
++URL: https://github.com/ETJAKEOC/TKT
  Source0: linux.tar.gz
  Source1: config
  Source2: diff.patch
-+Provides: kernel-uname-r = %{version}
- Provides: kernel-%{KERNELRELEASE}
- BuildRequires: bc binutils bison dwarves
- BuildRequires: (elfutils-libelf-devel or libelf-devel) flex
-@@ -25,8 +26,8 @@ The Linux Kernel, the operating system core itself
+@@ -25,8 +26,9 @@
+ The Linux Kernel, the operating system core itself
++The Linux Kernel, the operating system core itself, given some love by the TꓘT team.
+ 
  %package headers
  Summary: Header files for the Linux kernel for use by glibc
  Group: Development/System
@@ -20,7 +32,7 @@ index 726f34e119..231c1e2451 100644
  %description headers
  Kernel-headers includes the C header files that specify the interface
  between the Linux kernel and userspace libraries and programs.  The
-@@ -64,6 +65,22 @@ against the %{version} kernel package.
+@@ -64,6 +66,22 @@
  # a package redefinition error. ensure that doesn't happen
  %define debug_package %{nil}
  
@@ -43,3 +55,12 @@ index 726f34e119..231c1e2451 100644
  # later, we make all modules executable so that find-debuginfo.sh strips
  # them up. but they don't actually need to be executable, so remove the
  # executable bit, taking care to do it _after_ find-debuginfo.sh has run
+@@
+ if [ ! -e "/lib/modules/%{KERNELRELEASE}/modules.dep" ]; then
+ /usr/sbin/depmod %{KERNELRELEASE}
+ fi
++/usr/bin/dracut --force --hostonly --kver %{KERNELRELEASE}
++/usr/sbin/grub2-mkconfig -o /boot/grub2/grub.cfg
+ 
+ %preun
+ if [ -x /usr/bin/kernel-install ]; then
