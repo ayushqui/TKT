@@ -29,7 +29,7 @@ Want to help improve hardware coverage for the TKT project? You can contribute y
 # Option 2: modprobed-db (thorough + preferred)
 
 All the detailed steps—including how to install and set up modprobed-db, generate your module list, and submit a pull request—are now maintained in the dedicated contribution guide here:
-[ETJAKEOC/modprobed.db](https://github.com/ETJAKEOC/modprobedb.db)
+[ETJAKEOC/modprobed.db](https://github.com/ETJAKEOC/modprobed.db)
 
 ## Goals
 
