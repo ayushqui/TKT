@@ -313,13 +313,10 @@ if [ "$1" = "install" ]; then
         fi
       fi
 
-      if [ "$_distro" = "Suse" ]; then
-        msg2 "Creating initramfs"
-        sudo dracut --force --hostonly ${_dracut_options} --kver $_kernelname
-        msg2 "Updating GRUB"
-        sudo grub2-mkconfig -o /boot/grub2/grub.cfg
-      fi
-
+      msg2 "Creating initramfs"
+      sudo dracut --force --hostonly ${_dracut_options} --kver $_kernelname
+      msg2 "Updating GRUB"
+      sudo grub2-mkconfig -o /boot/grub2/grub.cfg
       msg2 "Install successful"
     fi
 

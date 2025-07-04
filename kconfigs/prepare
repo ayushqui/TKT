@@ -862,10 +862,6 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
   # Set some -TKT defaults
   _disable "DYNAMIC_FAULT" "DEFAULT_FQ_CODEL" "WERROR"
   _enable "DEFAULT_CAKE" "AMD_PRIVATE_COLOR"
-  if [ "$_kver" = "504" ]; then
-    _module "TP_SMAPI"
-    _enable "RAID6_USE_PREFER_GEN"
-  fi
   _disable "NTP_PPS" "ZSWAP_COMPRESSOR_DEFAULT_LZO" "PROFILE_ALL_BRANCHES"
   _enable "CRYPTO_LZ4" "CRYPTO_LZ4HC" "LZ4_COMPRESS" "LZ4HC_COMPRESS" "X86_AMD_PSTATE" "AMD_PINCTRL"
   _disable "DEBUG_FORCE_FUNCTION_ALIGN_64B" "X86_P6_NOP" "RCU_STRICT_GRACE_PERIOD"
@@ -961,7 +957,7 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
 
   _is_march_supported() {
     if [[ -z "$1" ]]; then
-      error "Internal linux-tkg bug: checking empty march string"
+      error "Internal TKT bug: checking empty march string"
       exit 1
     fi
 
@@ -982,12 +978,6 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
         return 1
       fi
     fi
-    # When Rust comes, soon :tm:
-    # if which rustc &> /dev/null; then
-    #   if ! ( rustc --print target-cpus | grep "$1" &> /dev/null ) ; then
-    #     return 1
-    #   fi
-    # fi
   }
 
   if [ -n "$_processor_opt" ] && ! _is_march_supported "$_processor_opt" ; then
@@ -1038,7 +1028,7 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
   fi
 
   # TCP algorithms
-  _tcp_cong_alg_list=("yeah" "bbr" "cubic" "vegas" "westwood" "reno")
+  _tcp_cong_alg_list=("yeah" "bbr" "cubic" "vegas" "westwood" "reno" "cake")
   _user_set_tcp_alg="false"
 
   _enable "TCP_CONG_ADVANCED"
@@ -1187,13 +1177,13 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
 
   # compiler optimization level
   if [ "$_compileroptlevel" = "1" ]; then
+    if [ "$_compileroptlevel" = "2" ]; then
     if [ "$_kver" != "504" ]; then
       _disable "CC_OPTIMIZE_FOR_PERFORMANCE_O3"
     else
       _disable "CC_OPTIMIZE_HARDER"
     fi
-  elif [ "$_compileroptlevel" = "2" ]; then
-    if [[ $_kver -ge 600 ]]; then
+  elif [[ $_kver -ge 600 ]]; then
       tkgpatch="$srcdir/0013-optimize_harder_O3.patch"
       _msg="Patching O3 optimization"
       _tkg_patcher
@@ -1762,15 +1752,6 @@ CONFIG_DEBUG_INFO_BTF_MODULES=y\r
     warning "Couldn't set -march and -mtune for C++ files in Makefile. Please open a bug report on this"
     [[ "$_nofallback" = "true" ]] && exit 1
   fi
-
-  # if local rustflags_source_line_number=$(grep -F -n 'KBUILD_RUSTFLAGS += $(KRUSTFLAGS)' Makefile 2> /dev/null | cut -d":" -f1); then
-  #   sed -i "${rustflags_source_line_number}i KBUILD_RUSTFLAGS += -Ztune-cpu=$_mtune" Makefile
-  #   sed -i "${rustflags_source_line_number}i KBUILD_RUSTFLAGS += -Ctarget-cpu=$_processor_opt" Makefile
-  #   sed -i "${rustflags_source_line_number}i # The following two lines are added by linux-tkg script" Makefile
-  # else
-  #   warning "Couldn't set -march and -mtune for Rust files in Makefile. Please open a bug report on this"
-  #   [[ "$_nofallback" = "true" ]] && exit 1
-  # fi
   set +o pipefail
 
   # copy new config file back to the user's git folder for an eventual future use
