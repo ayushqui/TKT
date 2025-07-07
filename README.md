@@ -5,16 +5,22 @@
 
 #### Tested distro's so far;
 ```
- -------------------------------
-| Arch Linux	=	Working |
-| Gentoo	=	Working |
-| Slackware	=	Working |
-| OpenSUSE = Working only if SELinux is disabled. This is a distro/userland issue, not kernel related. |
- -------------------------------
+ ---------------------------------------------------------------
+| Arch Linux	=	Working					|
+| Debian	=	Working					|
+| Fedora	=	Working					|
+| Gentoo	=	Working					|
+| Linux Mint	=	Working - (Use Ubuntu kernel)		|
+| OpenSUSE	=	Working - Only if SELinux is disabled.	|
+| Slackware	=	Working					|
+| Ubuntu	=	Working					|
+| Void Linux	=	Working					|
+ ---------------------------------------------------------------
 ```
 
-### WE NOW HAVE PREBUILT KERNELS FOR TESTING!!!
+### WE HAVE PREBUILT KERNELS FOR TESTING!!!
 #### Please check the release tab for the specific kernel of your choosing.
+#### All kernel builds tested in a VM install.
 
 - If you like the work I do here, and want to donate to me/the project, checkout the [DONATIONS.MD](https://github.com/ETJAKEOC/TKT/blob/main/DOCS/DONATIONS.md) file.
 - Please checkout the [CONTRIBUTIONS_GUIDELINE.MD](https://github.com/ETJAKEOC/TKT/blob/main/DOCS/CONTRIBUTION_GUIDELINE.md) file for information about collaboration or how to help the project in general.

@@ -8,6 +8,22 @@
 # All credits due to the previous pioneers of this script whom came before me. Thank you for your effort.
 # Hijacked by: ETJAKEOC <etjakeoc@gmail.com>
 
+pkgdesc='A customized Linux kernel install script, forked from the TKG script, aimed at a more performant tune, at the risk of stability.'
+arch=('x86_64') # no i686 in here
+url="https://www.kernel.org/"
+license=('GPL2')
+makedepends=(base-devel bc bison clang coreutils cpio docbook-xsl flex gcc git \
+graphviz imagemagick inetutils  initramfs kmod libelf lld llvm pahole \
+patchutils perl python-sphinx python-sphinx_rtd_theme schedtool sudo \
+tar wget xmlto xz)
+if [ "$_compiler_name" = "-llvm" ]; then
+  makedepends+=(llvm clang lld)
+elif ["$_compiler_name"="-gcc" ]; then
+  makedepends+=(gcc)
+fi
+optdepends=('schedtool')
+options=('!strip')
+
  # track basedir as different Arch based distros are moving srcdir around
 _where="$PWD"
 
@@ -49,18 +65,6 @@ fi
 pkgname=("${pkgbase}" "${pkgbase}-headers")
 pkgver="${_basekernel}"."${_sub}"
 pkgrel=1
-pkgdesc='A customized Linux kernel install script, forked from the TKG script, aimed at a more performant tune, at the risk of stability.'
-arch=('x86_64') # no i686 in here
-url="https://www.kernel.org/"
-license=('GPL2')
-makedepends=('bison' 'xmlto' 'docbook-xsl' 'inetutils' 'bc' 'libelf' 'pahole' 'patchutils' 'flex' 'python-sphinx' 'python-sphinx_rtd_theme' 'graphviz' 'imagemagick' 'git' 'cpio' 'perl' 'tar' 'xz' 'wget')
-if [ "$_compiler_name" = "-llvm" ]; then
-  makedepends+=( 'lld' 'clang' 'llvm')
-else
-  _compiler_name="-gcc"
-fi
-optdepends=('schedtool')
-options=('!strip')
 
 for f in "$_where"/kconfigs/"$_basekernel"/* "$_where"/kpatches/"$_basekernel"/*; do
   source+=( "$f" )

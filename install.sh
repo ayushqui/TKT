@@ -33,13 +33,8 @@ plain() {
  echo -e "$1" >&2
 }
 
-####################################################################
-
 ################### Config sourcing
 
-# We are either not using script or not within the script sub-command yet
-# we don't export the environment in the script sub-command so sourcing current_env will
-# get us the actual environment
 if [[ -z "$SCRIPT" ]]; then
   declare -p -x > current_env
 fi
@@ -53,16 +48,7 @@ fi
 
 . current_env
 
-if [[ "$_distro" != "Slackware" && "$_logging_use_script" =~ ^(Y|y|Yes|yes)$ && -z "$SCRIPT" ]]; then
-  export SCRIPT=1
-  msg2 "Using script"
-  /usr/bin/script -q -e -c "$0 $@" shell-output.log
-  exit
-fi
-
 source kconfigs/prepare
-
-####################################################################
 
 _distro_prompt() {
   echo "Which linux distribution are you running ?"
@@ -72,25 +58,61 @@ _distro_prompt() {
 }
 
 _install_dependencies() {
-  if [ "$_compiler_name" = "llvm" ]; then
-    clang_deps="llvm clang lld"
-  fi
-  if [ "$_distro" = "Debian" -o "$_distro" = "Ubuntu" ]; then
+  if [ "$_distro" = "Debian" ]; then
+    sudo apt update
     msg2 "Installing dependencies"
-    sudo apt install bc bison build-essential ccache cpio curl fakeroot flex git kmod libelf-dev libncurses-dev libssl-dev lz4 qtbase5-dev rsync schedtool wget zstd debhelper ${clang_deps} -y
+    if [[ "$_compiler_name" == *llvm* ]]; then
+      sudo apt install -y bc binutils binutils-dev binutils-gold bison build-essential ccache clang clang-format clang-tidy clang-tools cmake cpio curl debhelper device-tree-compiler dpkg-dev dwarves fakeroot flex g++ g++-multilib gcc gcc-multilib git gnupg kmod libc6-dev libc6-dev-i386 libdw-dev libelf-dev liblz4-tool libncurses-dev libnuma-dev libperl-dev libssl-dev libstdc++-12-dev libudev-dev lld llvm lz4 make ninja-build patchutils python3 python3-pip python3-setuptools qtbase5-dev rsync schedtool wget zstd
+    else
+      sudo apt install -y bc binutils binutils-dev binutils-gold bison build-essential ccache cmake cpio curl debhelper device-tree-compiler dpkg-dev dwarves fakeroot flex g++ g++-multilib gcc gcc-multilib git gnupg kmod libc6-dev libc6-dev-i386 libdw-dev libelf-dev liblz4-tool libncurses-dev libnuma-dev libperl-dev libssl-dev libstdc++-12-dev libudev-dev lz4 make ninja-build patchutils python3 python3-pip python3-setuptools qtbase5-dev rsync schedtool wget zstd
+    fi
+
   elif [ "$_distro" = "Fedora" ]; then
+    sudo dnf update -y
     msg2 "Installing dependencies"
-    sudo dnf install openssl-devel-engine hostname perl bison ccache curl dwarves elfutils-devel elfutils-libelf-devel fedora-packager fedpkg flex gcc-c++ git libXi-devel lz4 make ncurses-devel openssl openssl-devel perl-devel perl-generators pesign python3-devel qt5-qtbase-devel rpm-build rpmdevtools schedtool zstd bc rsync -y ${clang_deps} -y
-  elif [ "$_distro" = "Suse" ]; then
-    msg2 "Installing dependencies"
-    sudo zypper install -y bc bison ccache clang curl dwarves flex gcc-c++ gawk git hostname \
-         kernel-devel libXi-devel libuuid-devel lld llvm lz4 make ncurses-devel libnuma-devel \
-         libopenssl-devel libdw-devel patchutils perl pesign python3 python311-devel python311-pip \
-         libqt5-qtbase-devel rpm-build rsync wget zstd \
-         libelf-devel systemd-devel ${clang_deps}
+    if [[ "$_compiler_name" == *llvm* ]]; then
+      sudo dnf install --skip-unavailable -y bc bison ccache clang curl dwarves elfutils-devel elfutils-libelf-devel fedora-packager fedpkg flex gcc-c++ gawk git hostname libXi-devel libudev-devel libuuid-devel lld llvm lz4 make ncurses-devel numactl-dev openssl openssl-devel openssl-devel-engine patchutils perl perl-devel perl-generators pesign python3-devel python3-pip qt5-qtbase-devel rpm-build rpmdevtools rsync schedtool wget xz zstd
+    else
+      sudo dnf install --skip-unavailable -y bc bison ccache curl dwarves elfutils-devel elfutils-libelf-devel fedora-packager fedpkg flex gcc-c++ gawk git hostname libXi-devel libudev-devel libuuid-devel lz4 make ncurses-devel numactl-dev openssl openssl-devel openssl-devel-engine patchutils perl perl-devel perl-generators pesign python3-devel python3-pip qt5-qtbase-devel rpm-build rpmdevtools rsync schedtool wget xz zstd
+    fi
+
   elif [ "$_distro" = "Slackware" ]; then
+    sudo slackpkg update
     msg2 "Installing dependencies"
-    sudo slackpkg -batch=on -default_answer=y install bash bc bison binutils brotli clang cpio curl cyrus-sasl dwarves elfutils fakeroot fakeroot-ng file flex gcc gcc-g++ gcc-gcobol gcc-gdc gcc-gfortran gcc-gm2 gcc-gnat gcc-go gcc-objc gcc-rust gc glibc git guile gzip kernel-headers kmod libedit libelf libxml2 lld llvm lz4 lzop m4 make ncurses nghttp2 nghttp3 openssl patchutils perl python3 python3-pip rsync spirv-llvm-translator sudo tar time wget xxHash xz zstd ${clang_deps} || true
+    if [[ "$_compiler_name" == *llvm* ]]; then
+      sudo slackpkg -batch=on -default_answer=y install bash bc bison binutils brotli clang cpio curl cyrus-sasl dwarves elfutils fakeroot fakeroot-ng file flex gc gcc gcc-g++ gcc-gcobol gcc-gdc gcc-gfortran gcc-gm2 gcc-gnat gcc-go gcc-objc gcc-rust glibc git guile gzip kernel-headers kmod libedit libelf libxml2 lld llvm lz4 lzop m4 make ncurses nghttp2 nghttp3 openssl patchutils perl python3 python3-pip rsync spirv-llvm-translator sudo tar time wget xxHash xz zstd || true
+    else
+      sudo slackpkg -batch=on -default_answer=y install bash bc bison binutils brotli cpio curl cyrus-sasl dwarves elfutils fakeroot fakeroot-ng file flex gc gcc gcc-g++ gcc-gcobol gcc-gdc gcc-gfortran gcc-gm2 gcc-gnat gcc-go gcc-objc gcc-rust glibc git guile gzip kernel-headers kmod libedit libelf libxml2 lz4 lzop m4 make ncurses nghttp2 nghttp3 openssl patchutils perl python3 python3-pip rsync spirv-llvm-translator sudo tar time wget xxHash xz zstd || true
+    fi
+
+  elif [ "$_distro" = "Suse" ]; then
+    sudo zypper refresh
+  msg2 "Installing dependencies"
+  if [[ "$_compiler_name" == *llvm* ]]; then
+    sudo zypper install -y \
+      bc bison ccache clang curl dwarves flex gcc-c++ gawk git hostname kernel-devel kernel-source kernel-syms libXi-devel libdw-devel libelf-devel libnuma-devel libopenssl-devel libqt5-qtbase-devel libuuid-devel lld llvm lz4 make ncurses-devel patchutils perl pesign python3 python311-devel python311-pip rpm-build rsync systemd-devel wget zstd
+  else
+    sudo zypper install -y \
+      bc bison ccache curl dwarves flex gcc-c++ gawk git hostname kernel-devel kernel-source kernel-syms libXi-devel libdw-devel libelf-devel libnuma-devel libopenssl-devel libqt5-qtbase-devel libuuid-devel lz4 make ncurses-devel patchutils perl pesign python3 python311-devel python311-pip rpm-build rsync systemd-devel wget zstd
+  fi
+
+  elif [ "$_distro" = "Ubuntu" ]; then
+    sudo apt update
+    msg2 "Installing dependencies"
+    if [[ "$_compiler_name" == *llvm* ]]; then
+      sudo apt install -y bc binutils binutils-dev binutils-gold bison build-essential ccache clang clang-20 clang-format clang-tidy clang-tools cmake cpio curl debhelper device-tree-compiler dpkg-dev dwarves fakeroot flex g++ g++-multilib gcc gcc-multilib git gnupg kmod libc6-dev libc6-dev-i386 libdw-dev libelf-dev liblz4-tool libncurses-dev libnuma-dev libperl-dev libssl-dev libstdc++-14-dev libudev-dev lld lld-20 llvm llvm-20 lz4 make ninja-build patchutils python3 python3-pip python3-setuptools qtbase5-dev rsync schedtool software-properties-common wget zstd
+
+    else
+      sudo apt install -y bc binutils binutils-dev binutils-gold bison build-essential ccache cmake cpio curl debhelper device-tree-compiler dpkg-dev dwarves fakeroot flex g++ g++-multilib gcc gcc-multilib git gnupg kmod libc6-dev libc6-dev-i386 libdw-dev libelf-dev liblz4-tool libncurses-dev libnuma-dev libperl-dev libssl-dev libstdc++-14-dev libudev-dev lz4 make ninja-build patchutils python3 python3-pip python3-setuptools qtbase5-dev rsync schedtool software-properties-common wget zstd
+    fi
+
+  elif [ "$_distro" = "Void" ]; then
+    msg2 "Installing dependencies"
+    if [[ "$_compiler_name" == *llvm* ]]; then
+      sudo xbps-install base-devel bc bison ccache clang cmake cpio curl docbook-xsl elfutils-devel fakeroot flex gcc git gnupg graphviz kmod liblz4-devel lld llvm lz4 lzop m4 make ncurses ninja openssl-devel patch pkg-config pahole python3 rsync schedtool wget xmlto zstd
+    else
+      sudo xbps-install base-devel bc bison ccache cmake cpio curl docbook-xsl elfutils-devel fakeroot flex gcc git gnupg graphviz kmod liblz4-devel lz4 lzop m4 make ncurses ninja openssl-devel patch pkg-config pahole python3 rsync schedtool wget xmlto zstd
+    fi
   fi
 }
 
@@ -108,7 +130,7 @@ fi
 
 if [ "$1" = "install" ] || [ "$1" = "config" ]; then
 
-  if [[ -z "$_distro" || ! "$_distro" =~ ^(Ubuntu|Debian|Fedora|Suse|Gentoo|Slackware|Generic)$ ]]; then
+  if [[ -z "$_distro" || ! "$_distro" =~ ^(Ubuntu|Debian|Fedora|Suse|Gentoo|Slackware|Void|Generic)$ ]]; then
     msg2 "Variable \"_distro\" in \"customization.cfg\" has been set to an unkown value. Prompting..."
     _distro_prompt
   fi
@@ -177,12 +199,12 @@ if [ "$1" = "install" ]; then
 
   if [ -z "$_kernel_localversion" ]; then
     if [ "$_preempt_rt" = "1" ]; then
-      _kernel_flavor="${_cpusched}-rt${_compiler_name}"
+      _kernel_flavor="TKT-${_cpusched}-rt${_compiler_name}"
     else
-      _kernel_flavor="${_cpusched}${_compiler_name}"
+      _kernel_flavor="TKT-${_cpusched}${_compiler_name}"
     fi
   else
-    _kernel_flavor="${_kernel_localversion}"
+    _kernel_flavor="TKT-${_kernel_localversion}"
   fi
 
   # Setup kernel_subver variable
@@ -192,10 +214,6 @@ if [ "$1" = "install" ]; then
   else
     _kernel_subver="${_sub}"
   fi
-
-  #_timed_build() {
-    #_runtime=$( time ( schedtool -B -n 1 -e ionice -n 1 "$@" 2>&1 ) 3>&1 1>&2 2>&3 ) || _runtime=$( time ( "$@" 2>&1 ) 3>&1 1>&2 2>&3 ) - Bash 5.2 is broken https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=1018727
-  #}
 
   cd "$_kernel_work_folder_abs"
 
@@ -477,6 +495,66 @@ EOF
     tar --numeric-owner -cf - boot lib usr install | xz -9e > "Slackware-kernel-$_kernelname-TKT-x86_64-1.txz"
 
     msg2 "Slackware package created."
+
+  elif [[ "$_distro" == "Void" ]]; then
+
+    ./scripts/config --set-str LOCALVERSION "-${_kernel_flavor}"
+
+    if [[ "$_sub" = rc* ]]; then
+      _kernelname=$_basekernel.${_kernel_subver}-${_sub}-$_kernel_flavor
+    else
+      _kernelname=$_basekernel.${_kernel_subver}-$_kernel_flavor
+    fi
+
+    msg2 "Building kernel"
+    make ${llvm_opt} -j ${_thread_num}
+    msg2 "Build successful"
+
+    if [ "$_STRIP" = "true" ]; then
+      echo "Stripping vmlinux..."
+      strip -v $STRIP_STATIC "vmlinux"
+    fi
+
+    _headers_folder_name="linux-$_kernelname"
+
+    echo -e "\n\n"
+
+    msg2 "The installation process will run the following commands:"
+    echo "    # copy the patched and compiled sources to /usr/src/$_headers_folder_name"
+    echo "    sudo make modules_install"
+    echo "    sudo dracut --force --hostonly ${_dracut_options} --kver $_kernelname"
+    echo "    sudo grub-mkconfig -o /boot/grub/grub.cfg"
+
+    msg2 "Note: Uninstalling requires manual intervention, use './install.sh uninstall-help' for more information."
+    read -p "Continue ? Y/[n]: " _continue
+
+    if ! [[ "$_continue" =~ ^(Y|y|Yes|yes)$ ]];then
+      exit 0
+    fi
+
+    msg2 "Copying files over to /usr/src/$_headers_folder_name"
+    if [ -d "/usr/src/$_headers_folder_name" ]; then
+      msg2 "Removing old folder in /usr/src/$_headers_folder_name"
+      sudo rm -rf "/usr/src/$_headers_folder_name"
+    fi
+    sudo cp -R . "/usr/src/$_headers_folder_name"
+    sudo rm -rf "/usr/src/$_headers_folder_name"/.git*
+    cd "/usr/src/$_headers_folder_name"
+
+    msg2 "Installing modules"
+    if [ "$_STRIP" = "true" ]; then
+      sudo make modules_install INSTALL_MOD_STRIP="1"
+    else
+      sudo make modules_install
+    fi
+    msg2 "Installing headers"
+      sudo make headers_install
+    msg2 "Removing modules from source folder in /usr/src/${_kernel_src_gentoo}"
+    sudo find . -type f -name '*.ko' -delete
+    sudo find . -type f -name '*.ko.cmd' -delete
+
+    msg2 "Installing kernel"
+    sudo cp -a arch/x86/boot/bzImage /boot/vmlinuz-$_kernelname
 
   elif [[ "$_distro" =~ ^(Gentoo|Generic)$ ]]; then
 
