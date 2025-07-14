@@ -16,9 +16,9 @@ makedepends=(base-devel bc bison clang coreutils cpio docbook-xsl flex gcc git \
 graphviz imagemagick inetutils  initramfs kmod libelf lld llvm pahole \
 patchutils perl python-sphinx python-sphinx_rtd_theme schedtool sudo \
 tar wget xmlto xz)
-if [ "$_compiler_name" = "-llvm" ]; then
+if [[ "$_compiler_name" =~ llvm ]]; then
   makedepends+=(llvm clang lld)
-elif ["$_compiler_name"="-gcc" ]; then
+elif [[ "$_compiler_name" =~ gcc ]]; then
   makedepends+=(gcc)
 fi
 optdepends=('schedtool')

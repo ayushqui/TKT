@@ -244,8 +244,8 @@ _set_kver_internal_vars() {
   # examples: "600", "515", "504" we use this variable to have proper comparisons
   _kver="$VERSION$PATCHLEVEL"
 
-  if [ $_kver -le 605 ]; then
-    # chosen kernel <= 6.5
+  if [[ $_kver == "601" ]]; then
+    # chosen kernel <= 6.1
     _default_cpu_sched="cfs"
   else
     # chosen kernel >= 6.6
@@ -465,7 +465,7 @@ _define_kernel_abs_paths() {
   if [[ "$_kernel_source_folder" == /* ]]; then
     _kernel_source_folder_abs="$_kernel_source_folder/TKT/linux-kernel.git"
   fi
-  echo "_kernel_work_folder_abs=\"$_kernel_work_folder_abs\"" >> "$_where/TKT_CONFIG"
+  echo "_kernel_source_folder_abs=\"$_kernel_work_folder_abs\"" >> "$_where/TKT_CONFIG"
 
 }
 
@@ -719,12 +719,20 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
     _msg="Applying glitched base non-rt additions patch" && _tkg_patcher
   fi
 
-  tkgpatch="$srcdir/0013-fedora-rpm.patch"
-  _msg="RPM: fixing spec generator" && _tkg_patcher
-
-  if [[ "$_STRIP" == "true" ]]; then
-    tkgpatch="$srcdir/0013-fedora-strip-modules.patch"
-    _msg="RPM: strip modules" && _tkg_patcher
+  if [ "$_distro" = "Fedora" ]; then
+    tkgpatch="$srcdir/0013-fedora-rpm.patch"
+    _msg="RPM: fixing spec generator" && _tkg_patcher
+    if [[ "$_STRIP" == "true" ]]; then
+      tkgpatch="$srcdir/0013-fedora-strip-modules.patch"
+      _msg="RPM: strip modules" && _tkg_patcher
+    fi
+  elif [ "$_distro" = "Suse" ]; then
+    tkgpatch="$srcdir/0013-suse-rpm.patch"
+    _msg="RPM: fixing spec generator" && _tkg_patcher
+    if [[ "$_STRIP" == "true" ]]; then
+      tkgpatch="$srcdir/0013-suse-strip-modules.patch"
+      _msg="RPM: strip modules" && _tkg_patcher
+    fi
   fi
 
   if [ "$_distro" = "Suse" ]; then
@@ -936,12 +944,12 @@ echo "-${_custom_pkgbase}" > localversion.10-pkgrel
     _disable "GENTOO_KERNEL_SELF_PROTECTION"
   fi
 
-  # Prevent Debian and Ubuntu to sign stuff because it breaks stuff
-  if [[ "$_distro" = "Debian" || "$_distro" = "Ubuntu" ]]; then
+  # Prevent Debian, Mint, and Ubuntu to sign stuff because it breaks stuff
+  if [[ "$_distro" = "Debian"  || "$_distro" = "Mint"  || "$_distro" = "Ubuntu" ]]; then
     #Help Debian cert compile problem.
     scripts/config --set-str "SYSTEM_TRUSTED_KEYS" ""
     if [[ $_kver -lt 612 ]]; then # note: 6.12 removed MODULE_COMPRESS_NONE
-      #Debian/Ubuntu don't properly support zstd module compression
+      #Debian/Mint/Ubuntu don't properly support zstd module compression
       _disable "MODULE_COMPRESS_ZSTD"
       _enable "MODULE_COMPRESS_NONE"
     fi
@@ -1774,6 +1782,7 @@ exit_cleanup() {
   rm -f "$_where"/*.hook
   rm -f "$_where"/cleanup
   rm -f "$_where"/prepare
+  rm -f "$_where"minimal_modprobed.db
 
   # Remove state tracker
   rm -f "$_where"/TKT_CONFIG

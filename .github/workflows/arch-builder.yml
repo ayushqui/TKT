@@ -18,6 +18,7 @@ env:
   _STRIP: "true"
   _kernel_on_diet: "true"
   _nofallback: "false"
+  _distro: "Arch"
 
 jobs:
   build-kernel:
