@@ -459,13 +459,13 @@ _define_kernel_abs_paths() {
   if [[ "$_kernel_work_folder" == /* ]]; then
     _kernel_work_folder_abs="$_kernel_work_folder/TKT/linux-src-git"
   fi
-  echo "_kernel_work_folder_abs=\"$_kernel_work_folder_abs\"" >> "$_where/TKT_CONFIG"
+  echo "_kernel_work_folder_abs="$_kernel_work_folder_abs" >> "$_where/TKT_CONFIG"
 
   _kernel_source_folder_abs="$_where/$_kernel_source_folder/linux-kernel.git"
   if [[ "$_kernel_source_folder" == /* ]]; then
     _kernel_source_folder_abs="$_kernel_source_folder/TKT/linux-kernel.git"
   fi
-  echo "_kernel_source_folder_abs=\"$_kernel_work_folder_abs\"" >> "$_where/TKT_CONFIG"
+  echo "_kernel_source_folder_abs="$_kernel_work_folder_abs" >> "$_where/TKT_CONFIG"
 
 }
 
