@@ -11,7 +11,7 @@ on:
         type: string
 
 env:
-  _processor_opt: "x86-64"
+  _processor_opt: "alderlake"
   _git_mirror: "gregkh"
   _debugdisable: "true"
   _noccache: "true"
