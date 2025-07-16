@@ -1,7 +1,7 @@
 name: Build archlinux kernel
 
 on:
-  workflow_call:
+  workflow_dispatch:  # <-- This will allow manual triggering of the workflow
     inputs:
       _cpusched:
         required: true
